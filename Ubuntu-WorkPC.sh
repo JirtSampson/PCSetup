@@ -177,12 +177,42 @@ if [ ! -d "$HOME/.config/nvim" ]; then
 fi
 
 # Other small apps and utils
-sudo apt install -y neofetch fzf ripgrep bat eza zoxide plocate apache2-utils fd-find tldr
-snap install gimp
+echo "Installing other small termnial apps and utils"
+sudo apt install -y neofetch fzf ripgrep bat eza zoxide plocate apache2-utils fd-find tldr ]
+echo "Installing additional apt packages"
+sudo apt install -y wireshark haruna
+echo "Installing snap apps"
+sudo snap install gimp
+sudo snap install postman
+sudo snap install powershell
+sudo snap install kompare
+sudo snap install beekeeper-studio
+sudo snap install teams-for-linux
+sudo snap install aws-cli --classic
+sudo snap install onlyoffice-desktopeditors
+sudo snap install arduino
+sudo snap install remmina
+sudo snap install code --classic
+sudo snap install kcalc
+
+
+# JetBrains IDEs
+echo "Installing JetBrains IDEs"
+sudo snap install datagrip --classic
+sudo snap install pycharm-community --classic
+sudo snap install rubymine --classic
 
 # Install necessary packages for KVM virtualization for running Windows VM
-sudo apt install -y libvirt virt-manager qemu-kvm virtinst
-
+sudo apt install -y libvirt virt-manager qemu-kvm virtinst bridge-utils
 echo "Downloading the VirtIO drivers to ~/Downloads"
 mkdir -p ~/Downloads
 wget -O ~/Downloads/virtio-win-0.1.240.iso https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.240-1/virtio-win-0.1.240.iso
+
+# Install MS Edge browser for something other than Chrome/FF
+echo "Installing Microsoft Edge"
+wget https://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-stable/microsoft-edge-stable_138.0.3351.95-1_amd64.deb?brand=M102
+sudo apt install -y ./microsoft-edge-stable_138.0.3351.95-1_amd64.deb?brand=M102
+
+# Ignition
+echo "Sign in to DL and install Ignition"
+firefox https://files.inductiveautomation.com/release/ia/8.1.48/20250429-1106/ignition-8.1.48-linux-64-installer.ru
