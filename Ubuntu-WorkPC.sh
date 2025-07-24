@@ -3,10 +3,16 @@
 OMAKUB_USER_EMAIL=""
 OMAKUB_USER_NAME=""
 
+# Disable screen locking and sleep on GNOME before we start. Since we're removing GDM, it gets real cranky if the screen locks before we finish the process.
+if [[ "$XDG_CURRENT_DESKTOP" == *"GNOME"* ]]; then
+  # Ensure computer doesn't go to sleep or lock while installing
+  gsettings set org.gnome.desktop.screensaver lock-enabled false
+  gsettings set org.gnome.desktop.session idle-delay 0
+
 #Change to KDE DE
  sudo apt update -y
- sudo apt install kubuntu-desktop 
- sudo apt remove ubuntu-desktop gnome-shell && sudo apt autoremove
+ sudo apt install -y kubuntu-desktop 
+ sudo apt remove -y ubuntu-desktop gnome-shell && sudo apt autoremove -y
 
 # Populate ~/.local/share/omakub/configs with omakubs default configs and themes...we'll use some of them.
 rm -rf ~/.local/share/omakub
@@ -19,19 +25,16 @@ sudo apt install -y kde-config-flatpak plasma-discover-backend-flatpak
 sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
 
 # Install libraries for dev and building packages
-build-essential pkg-config autoconf bison clang rustc \
+sudo apt install -y build-essential pkg-config autoconf bison clang rustc \
   libssl-dev libreadline-dev zlib1g-dev libyaml-dev libreadline-dev libncurses5-dev libffi-dev libgdbm-dev libjemalloc2 \
   libvips imagemagick libmagickwand-dev mupdf mupdf-tools gir1.2-gtop-2.0 gir1.2-clutter-1.0 \
   redis-tools sqlite3 libsqlite3-0 libmysqlclient-dev libpq-dev postgresql-client postgresql-client-common
-
-# Install JetBrains apps
-snap install --classic datagrip
-snap install --classic rubymine
 
 # Install mise for managing multiple versions of Ruby, Python, Node.js, and Go. Install Python, Ruby, and Rails.
 sudo install -dm 755 /etc/apt/keyrings
 wget -qO - https://mise.jdx.dev/gpg-key.pub | gpg --dearmor | sudo tee /etc/apt/keyrings/mise-archive-keyring.gpg 1>/dev/null
 echo "deb [signed-by=/etc/apt/keyrings/mise-archive-keyring.gpg arch=$(dpkg --print-architecture)] https://mise.jdx.dev/deb stable main" | sudo tee /etc/apt/sources.list.d/mise.list
+sudo apt update -y
 sudo apt install -y mise
 mise use --global python@latest
 mise use --global ruby@latest
@@ -50,11 +53,7 @@ cd -
 # LastPass
 wget https://download.cloud.lastpass.com/linux/lplinux.tar.bz2
  tar xjvf lplinux.tar.bz2
- ./install_lastpass.sh
-
-# Obsidian is a multi-platform note taking application. See https://obsidian.md
-echo "Obsidian installation about to start. It may take up to 20 minutes on some systems!" -- sleep 3
-snap install --clssic obsidian
+ sudo ./install_lastpass.sh
 
 # Signal
 wget -qO- https://updates.signal.org/desktop/apt/keys.asc | gpg --dearmor >signal-desktop-keyring.gpg
@@ -184,7 +183,7 @@ sudo apt install -y wireshark haruna
 echo "Installing snap apps"
 sudo snap install gimp
 sudo snap install postman
-sudo snap install powershell
+sudo snap install powershell --classic
 sudo snap install kompare
 sudo snap install beekeeper-studio
 sudo snap install teams-for-linux
@@ -192,8 +191,9 @@ sudo snap install aws-cli --classic
 sudo snap install onlyoffice-desktopeditors
 sudo snap install arduino
 sudo snap install remmina
-sudo snap install code --classic
+#sudo snap install code --classic  - Do this as an apt package since it adds a PPA and works better as a system app
 sudo snap install kcalc
+sudo snap install --classic obsidian
 
 
 # JetBrains IDEs
