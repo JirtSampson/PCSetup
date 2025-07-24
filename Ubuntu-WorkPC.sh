@@ -215,4 +215,4 @@ sudo apt install -y ./microsoft-edge-stable_138.0.3351.95-1_amd64.deb?brand=M102
 
 # Ignition
 echo "Sign in to DL and install Ignition"
-firefox https://files.inductiveautomation.com/release/ia/8.1.48/20250429-1106/ignition-8.1.48-linux-64-installer.ru
+firefox https://files.inductiveautomation.com/release/ia/8.1.48/20250429-1106/ignition-8.1.48-linux-64-installer.run"
