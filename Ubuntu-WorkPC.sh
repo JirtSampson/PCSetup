@@ -8,6 +8,7 @@ if [[ "$XDG_CURRENT_DESKTOP" == *"GNOME"* ]]; then
   # Ensure computer doesn't go to sleep or lock while installing
   gsettings set org.gnome.desktop.screensaver lock-enabled false
   gsettings set org.gnome.desktop.session idle-delay 0
+fi
 
 #Change to KDE DE
  sudo apt update -y
@@ -28,7 +29,7 @@ sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flat
 sudo apt install -y build-essential pkg-config autoconf bison clang rustc \
   libssl-dev libreadline-dev zlib1g-dev libyaml-dev libreadline-dev libncurses5-dev libffi-dev libgdbm-dev libjemalloc2 \
   libvips imagemagick libmagickwand-dev mupdf mupdf-tools gir1.2-gtop-2.0 gir1.2-clutter-1.0 \
-  redis-tools sqlite3 libsqlite3-0 libmysqlclient-dev libpq-dev postgresql-client postgresql-client-common
+  redis-tools sqlite3 libsqlite3-0 libmysqlclient-dev libpq-dev postgresql-client postgresql-client-common cargo
 
 # Install mise for managing multiple versions of Ruby, Python, Node.js, and Go. Install Python, Ruby, and Rails.
 sudo install -dm 755 /etc/apt/keyrings
@@ -195,6 +196,9 @@ sudo snap install remmina
 sudo snap install kcalc
 sudo snap install --classic obsidian
 
+# Startship for terminal prompt
+sudo curl -sS https://starship.rs/install.sh | sh
+echo 'eval "$(starship init bash)"' >>~/.bashrc
 
 # JetBrains IDEs
 echo "Installing JetBrains IDEs"
@@ -203,16 +207,191 @@ sudo snap install pycharm-community --classic
 sudo snap install rubymine --classic
 
 # Install necessary packages for KVM virtualization for running Windows VM
-sudo apt install -y libvirt virt-manager qemu-kvm virtinst bridge-utils
+sudo apt install -y libvirt0 virt-manager qemu-kvm virtinst bridge-utils
 echo "Downloading the VirtIO drivers to ~/Downloads"
 mkdir -p ~/Downloads
 wget -O ~/Downloads/virtio-win-0.1.240.iso https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.240-1/virtio-win-0.1.240.iso
 
 # Install MS Edge browser for something other than Chrome/FF
-echo "Installing Microsoft Edge"
+echo "Attempting to download and installing Microsoft Edge..."
 wget https://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-stable/microsoft-edge-stable_138.0.3351.95-1_amd64.deb?brand=M102
 sudo apt install -y ./microsoft-edge-stable_138.0.3351.95-1_amd64.deb?brand=M102
 
+# Setting some preferences
+echo "Setting some preferences..."
+cat >> ~/.bashrc << 'EOF'
+
+# History settings
+HISTCONTROL=ignoreboth
+shopt -s histappend
+PROMPT_COMMAND="history -a; history -c; history -r"
+HISTTIMEFORMAT="%F %T "
+HISTSIZE=10000
+HISTFILESIZE=20000
+
+alias cat='bat'
+alias dig='dog'
+alias la='eza -a --icons'
+alias ll='eza -alh --icons'
+alias lla='eza -la --icons'
+alias ls='eza --tree --icons'
+alias lt='eza --tree'
+alias tree='eza --tree'
+alias vim='nvim'
+EOF
+
+cat >> ~/.config/starship.toml << 'EOF'
+"$schema" = "https://starship.rs/config-schema.json"
+format = "[](color_orange)$os$username[](bg:color_yellow fg:color_orange)$directory[](fg:color_yellow bg:color_aqua)$git_branch$git_status[](fg:color_aqua bg:color_blue)$c$rust$golang$nodejs$php$java$kotlin$haskell$python[](fg:color_blue bg:color_bg3)$docker_context$conda[](fg:color_bg3 bg:color_bg1)$time[ ](fg:color_bg1)$line_break$character"
+palette = "gruvbox_dark"
+
+[c]
+format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)"
+style = "bg:color_blue"
+symbol = " "
+
+[character]
+disabled = false
+error_symbol = "[](bold fg:color_red)"
+success_symbol = "[](bold fg:color_green)"
+vimcmd_replace_one_symbol = "[](bold fg:color_purple)"
+vimcmd_replace_symbol = "[](bold fg:color_purple)"
+vimcmd_symbol = "[](bold fg:color_green)"
+vimcmd_visual_symbol = "[](bold fg:color_yellow)"
+
+[conda]
+format = "[[ $symbol( $environment) ](fg:#83a598 bg:color_bg3)]($style)"
+style = "bg:color_bg3"
+
+[directory]
+format = "[ $path ]($style)"
+style = "fg:color_fg0 bg:color_yellow"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[directory.substitutions]
+Developer = "󰲋 "
+Documents = "󰈙 "
+Downloads = " "
+Music = "󰝚 "
+Pictures = " "
+
+[docker_context]
+format = "[[ $symbol( $context) ](fg:#83a598 bg:color_bg3)]($style)"
+style = "bg:color_bg3"
+symbol = ""
+
+[git_branch]
+format = "[[ $symbol $branch ](fg:color_fg0 bg:color_aqua)]($style)"
+style = "bg:color_aqua"
+symbol = ""
+
+[git_status]
+format = "[[($all_status$ahead_behind )](fg:color_fg0 bg:color_aqua)]($style)"
+style = "bg:color_aqua"
+
+[golang]
+format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)"
+style = "bg:color_blue"
+symbol = ""
+
+[haskell]
+format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)"
+style = "bg:color_blue"
+symbol = ""
+
+[java]
+format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)"
+style = "bg:color_blue"
+symbol = " "
+
+[kotlin]
+format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)"
+style = "bg:color_blue"
+symbol = ""
+
+[line_break]
+disabled = false
+
+[nodejs]
+format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)"
+style = "bg:color_blue"
+symbol = ""
+
+[os]
+disabled = false
+style = "bg:color_orange fg:color_fg0"
+
+[os.symbols]
+Alpine = ""
+Amazon = ""
+Android = ""
+Arch = "󰣇"
+Artix = "󰣇"
+CentOS = ""
+Debian = "󰣚"
+EndeavourOS = ""
+Fedora = "󰣛"
+Gentoo = "󰣨"
+Linux = "󰌽"
+Macos = "󰀵"
+Manjaro = ""
+Mint = "󰣭"
+Raspbian = "󰐿"
+RedHatEnterprise = "󱄛"
+Redhat = "󱄛"
+SUSE = ""
+Ubuntu = "󰕈"
+Windows = "󰍲"
+
+[palettes.gruvbox_dark]
+color_aqua = "#689d6a"
+color_bg1 = "#3c3836"
+color_bg3 = "#665c54"
+color_blue = "#458588"
+color_fg0 = "#fbf1c7"
+color_green = "#98971a"
+color_orange = "#d65d0e"
+color_purple = "#b16286"
+color_red = "#cc241d"
+color_yellow = "#d79921"
+
+[php]
+format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)"
+style = "bg:color_blue"
+symbol = ""
+
+[python]
+format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)"
+style = "bg:color_blue"
+symbol = ""
+
+[rust]
+format = "[[ $symbol( $version) ](fg:color_fg0 bg:color_blue)]($style)"
+style = "bg:color_blue"
+symbol = ""
+
+[time]
+disabled = false
+format = "[[  $time ](fg:color_fg0 bg:color_bg1)]($style)"
+style = "bg:color_bg1"
+time_format = "%R"
+
+[username]
+format = "[ $user ]($style)"
+show_always = true
+style_root = "bg:color_orange fg:color_fg0"
+style_user = "bg:color_orange fg:color_fg0"
+EOF
+
+# Installing system terminal font
+echo "Installing system terminal font..."
+cd /tmp
+wget https://release-assets.githubusercontent.com/github-production-release-asset/27574418/618d36f5-7bcc-4e03-a153-30d18952aa14?sp=r&sv=2018-11-09&sr=b&spr=https&se=2025-07-24T10%3A49%3A17Z&rscd=attachment%3B+filename%3DJetBrainsMono.zip&rsct=application%2Foctet-stream&skoid=96c2d410-5711-43a1-aedd-ab1947aa7ab0&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skt=2025-07-24T09%3A48%3A55Z&ske=2025-07-24T10%3A49%3A17Z&sks=b&skv=2018-11-09&sig=tWgskAcUYheoIt%2FHtN6lut2oznUxFMsV6BzFZ5VO39c%3D&jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmVsZWFzZS1hc3NldHMuZ2l0aHVidXNlcmNvbnRlbnQuY29tIiwia2V5Ijoia2V5MSIsImV4cCI6MTc1MzM1MTI2NSwibmJmIjoxNzUzMzUwOTY1LCJwYXRoIjoicmVsZWFzZWFzc2V0cHJvZHVjdGlvbi5ibG9iLmNvcmUud2luZG93cy5uZXQifQ.iWDT6GdkGkiZq7IvsbOOgnrtkibgSzKwOhuxBDwGa48&response-content-disposition=attachment%3B%20filename%3DJetBrainsMono.zip&response-content-type=application%2Foctet-stream
+unzip JetBrainsMono.zip
+sudo cp /tmp/*.ttf /usr/share/fonts/truetype/
+sudo fc-cache -f -v
+
 # Ignition
-echo "Sign in to DL and install Ignition"
-firefox https://files.inductiveautomation.com/release/ia/8.1.48/20250429-1106/ignition-8.1.48-linux-64-installer.run"
+echo "All Done! Sign in to DL and install Ignition, and reboot into the new system when done."
+firefox "https://files.inductiveautomation.com/release/ia/8.1.48/20250429-1106/ignition-8.1.48-linux-64-installer.run"
